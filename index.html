@@ -1,0 +1,1135 @@
+<html>
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Lato&amp;subset=latin-ext" rel="stylesheet">
+	<meta charset="utf-8">
+	<meta name="description" content="Prosty emulator maszyny RAM">
+	<meta name="author" content="Michał Zdziebło">
+	<title>Emulator Maszyny RAM</title>
+	<Style>
+		body
+		{
+			font-size:20px;
+			margin:0;
+			font-family: 'Lato', sans-serif;
+			box-sizing:border-box;
+			min-width:1040px;
+			user-select:none;
+
+		}
+		table
+		{
+			font-size:20px;
+			border-collapse: collapse;
+			text-align:center;
+		}
+		button
+		{
+			background-color:white;
+			border: 2px solid #199fff;
+			font-size:15px;
+			border-radius:3px;
+			color:#199fff;
+			transition: background-color .1s ease-in-out;
+			padding:5px 10px 5px 10px;
+			margin:1px;
+		}
+		button:hover
+		{
+			background-color:#199fff;
+			color:white;
+		}
+		.plus
+		{
+			border-color:#1fc91c;
+			color:#1fc91c;
+		}
+		.plus:hover
+		{
+			background-color:#1fc91c;
+		}
+		.minus
+		{
+			border-color:#ed0e0e;
+			color:#ed0e0e;
+		}
+		.minus:hover
+		{
+			background-color:#ed0e0e;
+		}
+		input
+		{
+			border: 1px solid #a3a3a3;
+			border-radius:3px;
+			font-size:20px;
+			text-align:center;
+		}
+		select
+		{
+			border: 1px solid #a3a3a3;
+			border-radius:3px;
+			font-size:20px;
+		}
+		hr
+		{
+			display:block;
+			border:0.5px solid #d6d6d6;
+		}
+		.x
+		{
+			position:absolute;
+			right:20px;
+			top:20px;
+			border-color:#ed0e0e;
+			color:#ed0e0e;
+		}
+		.x:hover
+		{
+			background-color:#ed0e0e;
+		}
+		#pomoc
+		{
+			position:absolute;
+			left:40px;
+			top:40px;
+			right:40px;
+			bottom:40px;
+			background-color:white;
+			border: 1px solid #ddd;
+			z-index:100;
+			display:none;
+			padding:30px;
+			overflow:auto;
+		}
+		#logo
+		{
+			background-color:#199fff;
+			padding:10px;
+			color:white;
+			margin:10px auto 10px auto;
+			text-align:center;
+			font-size:40px;
+			border-radius:5vw;
+			width:460px;
+		}
+		#menu
+		{
+			position:absolute;
+			right:50px;
+			top:28px;
+		}
+		#content
+		{
+			
+		}
+		#lewy
+		{
+			float:left;
+			overflow:auto;
+			width: calc(100% - 400px);
+			height: calc(100% - 88px);
+		}
+		#program
+		{
+			width:100%;
+		}
+		#program input
+		{
+			width:100%;
+		}
+		#program td, #program th {
+			border: 1px solid #ddd;
+			padding: 8px;
+		}
+		#program tr:nth-child(even)
+		{
+			background-color: #f2f2f2;
+		}
+		#program th 
+		{
+		background-color: #199fff;
+		color: white;
+		}
+		#operacje
+		{
+			padding-left:35px !important;
+			padding-right:35px !important;
+		}
+		#prawy
+		{
+			float:left;
+			box-sizing:border-box;
+			border:1px solid #d6d6d6;
+			padding:10px;
+			background-color:white;
+			width:400px;
+			text-align:center;
+			height: calc(100% - 88px);
+			overflow:auto;
+		}
+		#wejscie
+		{
+			height:54px;
+			overflow:auto;
+		}
+		
+		#wejscie input
+		{
+			width:50px;
+		}
+		#status
+		{
+			overflow:auto;
+			height:15%;
+			width:100%;
+			font-size:15px;
+			border:1px solid #a3a3a3;
+			background-color:white;
+		}
+		#wyjscie
+		{
+			height:40px;
+			overflow:auto;
+		}
+		.wyjscieel
+		{
+			border:1px solid black;
+			float:left;
+			padding:5px;
+		}
+		#rejestr
+		{
+			overflow:auto;
+			height:10%;
+			width:100%;
+		}
+		#rejestr table, #rejestr th, #rejestr td 
+		{
+			border: 1px solid #d6d6d6;
+			width:100%;
+			table-layout:fixed;
+		}
+		#kod_programu
+		{
+			width:100%;
+			height:100px;
+		}
+		#opis
+		{
+			margin:auto;
+		}
+		#opis td,#opis th
+		{
+			border: 1px solid #ddd;
+		}
+		.opisy
+		{
+			display:none;
+		}
+		#pomoc h3
+		{
+			transition:color .1s ease-in-out;
+		}		
+		#pomoc h3:hover
+		{
+			color:#606060;
+		}
+		p
+		{
+			display:inline;
+		}
+		#aktualny
+		{
+			background-color:green; !important
+		}
+	</style>
+</head>
+<body>
+	<div id="pomoc">
+		<center><h1>Pomoc</h1></center>
+		<button onclick="pomoc(0)" class="x">X</button>
+		<h3 onclick="rozwin(1)">Krótki opis maszyn RAM <p id="znak1">&#709;</p></h3>
+		<p id="pomoc1" class="opisy">
+			Maszyna RAM – jest modelem abstrakcyjnej maszyny ze swobodnym dostępem do pamięci.
+			Programem maszyny RAM jest ciąg poleceń, które mogą być poprzedzone etykietą. W tym emulatorze mamy dostępne następujące polecenia:
+			<table id="opis">
+				<tr><th>Kod operacji</th><th>Opis</th></tr>
+				<tr><td>LOAD</td><td>Wpisuje do rejestru 0 wartość podaną w adresie.</td></tr>
+				<tr><td>STORE</td><td>Wpisuje wartość z rejestru 0 do rejestru podanego w adresie</td></tr>
+				<tr><td>ADD</td><td>Dodaje do rejestru 0 wartość podaną w adresie</td></tr>
+				<tr><td>SUB</td><td>Odejmuje od rejestru 0 wartość podaną w adresie</td></tr>
+				<tr><td>MULT</td><td>Mnoży rejestr 0 przez wartość podaną w adresie</td></tr>
+				<tr><td>DIV</td><td>Dzieli rejestr 0 przez wartość podaną w adresie</td></tr>
+				<tr><td>READ</td><td>Wczytuje kolejną wartość z taśmy do podanego adresu</td></tr>
+				<tr><td>WRITE</td><td>Zapisuje kolejno na taśmie wartość podaną w adresie</td></tr>
+				<tr><td>JUMP</td><td>Skacze bezwarunkowo do miejsca w programie wskazanego etykietą</td></tr>
+				<tr><td>JGTZ</td><td>Skacze do miejsca w programie wskazanego etykietą jeżeli w rejestrze jest wartość większa od zera</td></tr>
+				<tr><td>JZERO</td><td>Skacze do miejsca w programie wskazanego etykietą jeżeli w rejestrze 0 jest wartość równa 0</td></tr>
+				<tr><td>HALT</td><td>Kończy program</td></tr>
+			</table>
+			W ogólnym przypadku komenda składa się z kodu operacji i adresu który może być etykietą czyli nazwą symboliczną lub operandem, nalężącym do trzech typów:<br>
+			= i - wartością tego operandu jest liczba całkowita i<br>
+			i - zawartość rejestru o numerze i (i powinno być nieujemne)<br>
+			*i - wartością operandu jest zawartość rejestru, którego numerem jest wartość rejestru i<br>
+			Wyjątekiem jest komenda HALT, która nie posiada adresu.
+		</p>
+		<h3 onclick="rozwin(2)">Wpisywanie poleceń <p id="znak2">&#709;</p></h3>
+		<p id="pomoc2" class="opisy">
+			Polecenia możemy wpisywać w tabeli po lewej stronie. W kolumnie etykieta możemy wpisać dowolny ciąg znaków, ważne aby nie zawierał w sobie średnika i przecinka. W kolumnie Komenda mamy do wyboru listę komend dostępnych w emulatorze. W kolumnie Adres po lewej stronie możemy wybrać znak operandu po prawej natomiast możemy wpisać wartość operandu. Jeżeli wpisujemy etykietę znak zostawiamy pusty, natomiast w przypadku polecenia HALT oba pola zostają puste. W komentarzu możemy wpisać dowolny ciąg znaków bez przecinka i średnika.
+			<br>Przycisk<button class="plus">+</button>Dodaje wpisaną przez nas komendę. W przypadku błędnego zapisu w oknie status wyświetli się odpowiedni komunikat. Tym przyciskiem możemy również dodać polecenie w środku listy komend. Po kliknięciu tego przycisku obok komendy powyżej pojawią się pola do których możemy wpisać nowe polecenie i zatwierdzić je przyciskiem <button>OK</button>
+			<br>Przycisk<button class="minus">-</button>Usuwa komendę przy której się znajduje
+			<br>Po naciśnięciu przycisku <button>Edytuj</button> możemy edytować komendę znajdującą się obok.
+		</p>
+		<h3 onclick="rozwin(3)">Taśma wejściowa <p id="znak3">&#709;</p></h3>
+		<p id="pomoc3" class="opisy">
+			Elementy taśmy wejściowej będą wczytywane po kolei zaczynając od pierwszego dodanego elementu. Liczby podane jako wejście muszą być typu całkowitego. Jeżeli element taśmy wejściowej będzie pusty zostanie wczytany jako zero.<br>
+		</p>
+		<h3 onclick="rozwin(4)">Uruchamianie programu <p id="znak4">&#709;</p></h3>
+		<p id="pomoc4" class="opisy">
+			Przycisk <button>Wykonaj</button> wykonuje program od początku do końca. Jeżeli program napotka jakiś błąd, wyświetli odpowiedni komunikat.<br>
+			Przycisk <button>></button> wykonuje następną komendę.<br>
+			Przycisk <button>RESET</button> zaczyna program od nowa.<br>
+		</p>
+		<h3 onclick="rozwin(5)">Licznik rozkazów <p id="znak5">&#709;</p></h3>
+		<p id="pomoc5" class="opisy">
+		Licznik rozkazów wskazuje nam polecenie, które ma być wykonane jako następna. Następne polecenie jest również zaznaczone na zielono.<br>
+		</p>
+		<h3 onclick="rozwin(6)">Status <p id="znak6">&#709;</p></h3>
+		<p id="pomoc6" class="opisy">
+			Okno status wyświetla informacje związane z wykonywaniem się programu jak i z błędami podczas wpisywania komend w tabeli oraz podczas wczytywania koemnd z tekstu.
+		</p>
+		<h3 onclick="rozwin(7)">Taśma wyjściowa <p id="znak7">&#709;</p></h3>
+		<p id="pomoc7" class="opisy">
+			Na taśmie wyjściowej pojawią sie kolejne wartości uzyskane przez polecenie WRITE.
+		</p>
+		<h3 onclick="rozwin(8)">Zawartość rejestrów <p id="znak8">&#709;</p></h3>
+		<p id="pomoc8" class="opisy">
+			Wyświetla nam wartości które aktualnie znajdują się w rejestrach.
+		</p>
+		<h3 onclick="rozwin(9)">Załaduj/Pobierz kod <p id="znak9">&#709;</p></h3>
+		<p id="pomoc9" class="opisy">
+			Przycisk <button>Pokaż kod</button> wyświetli w oknie kod naszego programu w postaci ciągu znaków. Każdy element polecenia zostanie rozdzielony przecinkami, każde polecenie zostanie rozdzielone średnikiem.<br>
+			Przycisk <button>Załaduj kod</button> pobiera kod znajdujacy sie w oknie i wpisuje go do pamieci. Format wpisanego kodu musi być taki sam jak w przypadku kodu, który został wyświetlony, czyli poszczególne elementy polecenia muszą być rozdzielone przecinkami, natomiast polecenia zostaną oddzielone średnikiem. Kod może być dowolnie rozdzielony znakami tak jak odstęp czy tabulacja.
+		</p>
+		<h3 onclick="rozwin(10)">Przykladowe programy <p id="znak10">&#709;</p></h3>
+		<p id="pomoc10" class="opisy">
+			Przycisk <button>Załaduj program</button> pozwala nam załadować program wybrany z listy do pamieci naszej maszyny.
+		</p>
+	</div>
+	<div id="content">
+	<div id="logo">
+		Emulator maszyny RAM
+		<div id="menu">
+			<button onclick="pomoc(1)">Pomoc</button>
+		</div>
+	</div>
+		<div id="lewy">
+			<table id="program">
+				<tr id="firstrow">
+					<th>
+						Nr
+					</th>
+					<th>
+						Etykieta
+					</th>
+					<th>
+						Komenda
+					</th>
+					<th colspan="2">
+						
+						Adres
+					</th>
+					<th>
+						Komentarz
+					</th>
+					<th id="operacje">
+						Operacje
+					</th>
+				</tr>
+				<tr id="lastrow">
+					<td>
+					</td>
+					<td>
+						<input id="etykieta">
+					</td>
+					<td>
+						<select id="komenda" name="komenda" onclick="poprawnosc()" onchange="poprawnosc()">
+							<option value="LOAD">LOAD</option>
+							<option value="STORE">STORE</option>
+							<option value="ADD">ADD</option>
+							<option value="SUB">SUB</option>
+							<option value="MULT">MULT</option>
+							<option value="DIV">DIV</option>
+							<option value="READ">READ</option>
+							<option value="WRITE">WRITE</option>
+							<option value="JUMP">JUMP</option>
+							<option value="JZERO">JZERO</option>
+							<option value="JGTZ">JGTZ</option>
+							<option value="HALT">HALT</option>
+						</select>
+					</td>
+					<td>
+						<select id="znak" name="znak" onclick="poprawnosc()">
+							<option value=""></option>
+							<option value="=">=</option>
+							<option value="*">*</option>
+						</select>
+					</td>
+					<td>
+						<input id="adres" onchange="poprawnosc()">
+					</td>
+					<td>
+						<input id="komentarz">
+					</td>
+					<td>
+						<button class="plus" id="dodaj" onclick="dodaj()">+</button>
+					</td>
+				</tr>
+			</table>	
+		</div>
+		<div id="prawy">
+			Taśma wejściowa
+			<button class="plus" onclick="wejscie_dodaj()">+</button>
+			<button class="minus" onclick="wejscie_usun()">-</button>
+			<div id="wejscie">
+			</div>
+			<hr>
+			<button onclick="wykonaj()">Wykonaj</button>
+			<button id="wykonaj1" onclick="wykonaj_1()">></button>
+			<button onclick="reset()">Reset</button><br>
+			<hr>
+			<div id="licznik_rozkazow">
+			</div>
+			<hr>
+			Status:
+			<div id="status">
+			</div>
+			<hr>
+			Taśma wyjściowa
+			<div id="wyjscie">
+				
+			</div>
+			<div style="clear:both"></div>
+			<hr>
+			Zawartosc rejestrow
+			<div id="rejestr"></div>
+			<hr>
+			Załaduj/Pobierz kod
+			<textarea id="kod_programu"></textarea>
+			<button onclick="pokaz_kod()">Pokaz kod</button>
+			<button onclick="zaladuj_kod()">Zaladuj kod</button>
+			<hr>
+			Przykładowe programy<br>
+			<select id="programy">
+				<option value="ndon">Oblicz n^n</option>
+				<option value="silnia">Oblicz silnie</option>
+				<option value="suma">Sumowanie liczb</option>
+			</select>
+			<button onclick="przykladowe_programy()">Załaduj program</button>
+		</div>
+	</div>
+	<script>
+	var rejestry=[0];
+	var etykiety=[];
+	var polaczenia=[];
+	var komendy=[];
+	var znaki=[];
+	var adresy=[];
+	var komentarze=[];
+	var ik=0;
+	var zawartosc;
+	var rozmiar_wejscia=0;
+	var glowica_wejscia=0;
+	var nr=0;
+	var ilosc_iteracji=0;
+	var zmiana_statusu=0;
+	var zawartosc_wejscie = wejscie=document.getElementById("wejscie").innerHTML;
+	var ndon=',READ,,1,;\n,LOAD,,1,;\n,JGTZ,,dod,;\n,WRITE,=,0,;\n,JUMP,,koniecjesli,;\ndod,LOAD,,1,;\n,STORE,,2,;\n,LOAD,,1,;\n,SUB,=,1,;\n,STORE,,3,;\ndopoki,LOAD,,3,;\n,JGTZ,,kontyn,;\n,JUMP,,koniecdopoki,;\nkontyn,LOAD,,2,;\n,MULT,,1,;\n,STORE,,2,;\n,LOAD,,3,;\n,SUB,=,1,;\n,STORE,,3,;\n,JUMP,,dopoki,;\nkoniecdopoki,WRITE,,2,;\nkoniecjesli,HALT,,,;\n';
+	var silnia=',READ,,1,;,LOAD,=,1,;,STORE,,2,;JESZCZE,LOAD,,1,;,JZERO,,GOTOWE,;,MULT,,2,;,STORE,,2,;,LOAD,,1,;,SUB,=,1,;,STORE,,1,;,JUMP,,JESZCZE,;GOTOWE,WRITE,,2,;,HALT,,,;';
+	var suma='CZYTAJ,READ,,1,wczytaj kolejną wartość z taśmy;,LOAD,,1,;,JZERO,,KONIEC,jeśli wartość = 0 zakończ sumowanie;,ADD,,2,dodaj dotychczasową sumę do wartości;,STORE,,2,zapisz nową sumę;,JUMP,,CZYTAJ,;KONIEC,WRITE,,2,wypisz sumę;,HALT,,,;'
+
+
+	rejestr_odswiez();
+	licznik_rozkazow();
+	function poprawnosc(x,y)
+	{	
+		if(x==undefined)
+		{
+			var komenda=document.getElementById("komenda");
+			var znak=document.getElementById("znak");
+			var adres=document.getElementById("adres");
+			var dodaj=document.getElementById("dodaj");
+			var click="dodaj()";
+		}
+		else
+		{
+			var komenda=document.getElementById("komenda"+x);
+			var znak=document.getElementById("znak"+x);
+			var adres=document.getElementById("adres"+x);
+			var dodaj=document.getElementById("dodaj"+x);
+			if(y==undefined)
+			{
+				var click="edytuj("+x+")";
+			}
+			else
+			{
+				var click="dodaj("+x+")";
+			}
+		}
+		if(komenda.value == 'STORE' || komenda.value == 'READ')
+		{
+			
+			znak.options[0].disabled=false;
+			znak.options[1].disabled=true;
+			znak.options[2].disabled=false;
+			if(znak.value=='=')
+			{
+				znak.options[0].selected=true;
+			}
+		}
+		else if(komenda.value == 'JUMP' || komenda.value == 'JGTZ' || komenda.value == 'JZERO' || komenda.value == 'HALT')
+			{
+			znak.options[0].disabled=false;
+			znak.options[1].disabled=true;
+			znak.options[2].disabled=true;
+			if(znak.value!='')
+				{
+				znak.options[0].selected=true;
+				}
+			}
+		else
+			{
+			znak.options[0].disabled=false;
+			znak.options[1].disabled=false;
+			znak.options[2].disabled=false;
+			}
+		if(isNaN(adres.value) && komenda.value != 'JUMP' && komenda.value != 'JGTZ' && komenda.value != 'JZERO' && komenda.value != 'HALT')
+		{
+			adres.style.borderColor="red";
+			adres.style.backgroundColor="#ffe2e2";
+			dodaj.setAttribute("onclick","");
+			status("Ta komenda moze w adresie mieć tylko liczbe");
+		}
+		else if(adres.value !='' && komenda.value == 'HALT')
+		{
+			adres.style.borderColor="red";
+			adres.style.backgroundColor="#ffe2e2";
+			dodaj.setAttribute("onclick","");
+			status("Komenda HALT nie posiada adresu");
+		}
+		else if(znak.value!="=" && parseInt(adres.value)<0 && komenda.value != 'JUMP' && komenda.value != 'JGTZ' && komenda.value != 'JZERO' && komenda.value != 'HALT')
+		{
+			adres.style.borderColor="red";
+			adres.style.backgroundColor="#ffe2e2";
+			dodaj.setAttribute("onclick","");
+			status("Adresem może być tylko rejestr dodatni");
+		}
+		else
+		{
+			adres.style.borderColor="#a3a3a3";
+			adres.style.backgroundColor="white";
+			dodaj.setAttribute("onclick",click);;
+		}
+	}
+	function dodaj(x)
+	{
+		if(x==undefined)
+		{
+		etykiety.push(document.getElementById("etykieta").value);
+		komendy.push(document.getElementById("komenda").value);
+		znaki.push(document.getElementById("znak").value);
+		adresy.push(document.getElementById("adres").value);
+		komentarze.push(document.getElementById("komentarz").value);
+		document.getElementById("etykieta").value='';
+		document.getElementById("adres").value='';
+		document.getElementById("komentarz").value='';
+		}
+		else
+		{
+		etykiety.splice(x,0,document.getElementById("etykieta"+x).value);
+		komendy.splice(x,0,document.getElementById("komenda"+x).value);
+		znaki.splice(x,0,document.getElementById("znak"+x).value);
+		adresy.splice(x,0,document.getElementById("adres"+x).value);
+		komentarze.splice(x,0,document.getElementById("komentarz"+x).value);
+		document.getElementById("etykieta"+x).value='';
+		document.getElementById("adres"+x).value='';
+		document.getElementById("komentarz"+x).value='';
+		}
+		ik++;
+		wypisz_komendy();
+	}
+	function usun(x)
+	{
+		if(ik>0)
+		{
+			etykiety.splice(x,1);
+			komendy.splice(x,1);
+			znaki.splice(x,1);
+			adresy.splice(x,1);
+			komentarze.splice(x,1);
+			ik--;
+			wypisz_komendy();
+		}
+	}
+	function edytuj(x)
+	{
+		etykiety[x]=document.getElementById("etykieta"+x).value;
+		komendy[x]=document.getElementById("komenda"+x).value;
+		znaki[x]=document.getElementById("znak"+x).value;
+		adresy[x]=document.getElementById("adres"+x).value;
+		komentarze[x]=document.getElementById("komentarz"+x).value;
+		wypisz_komendy();
+	}
+	function wypisz_komendy(x,y)
+	{
+		var tabela='<table id="program"><tr id="firstrow">'+document.getElementById("firstrow").innerHTML+'</tr>';
+		if(x == undefined)
+		{
+			for(var i=0;i<ik;i++)
+			{
+				if(nr==i)	
+					tabela+='<tr style="background-color:#9effaf">';
+				else
+					tabela+='<tr>';
+				tabela+='<td>'+(i+1)+'</td>';
+				tabela+='<td>'+etykiety[i]+'</td>';
+				tabela+='<td>'+komendy[i]+'</td>';
+				tabela+='<td colspan="2">'+znaki[i]+adresy[i]+'</td>';
+				tabela+='<td>'+komentarze[i]+'</td>';
+				tabela+='<td><button class="plus" onclick="wypisz_komendy('+i+',1)">+</button><button class="minus" onclick="usun('+i+')">-</button><button onclick="wypisz_komendy('+i+')">Edytuj</button></td>';
+				tabela+='</tr>';
+			}
+		}
+		else
+		{
+			for(var i=0;i<x;i++)
+			{
+				tabela+='<tr>';
+				tabela+='<td>'+(i+1)+'</td>';
+				tabela+='<td>'+etykiety[i]+'</td>';
+				tabela+='<td>'+komendy[i]+'</td>';
+				tabela+='<td colspan="2">'+znaki[i]+adresy[i]+'</td>';
+				tabela+='<td>'+komentarze[i]+'</td>';
+				tabela+='<td><button class="plus" onclick="wypisz_komendy('+i+',1)">+</button><button class="minus" onclick="usun('+i+')">-</button><button onclick="wypisz_komendy('+i+')">Edytuj</button></td>';
+				tabela+='</tr>';
+			}
+			if(y==undefined)
+			{
+			tabela+='<tr>';
+			tabela+='<td>'+(x+1)+'</td>';
+			tabela+='<td><input id="etykieta'+x+'" name="etykieta'+x+'" value="'+etykiety[x]+'"></td>';
+			tabela+='<td><select id="komenda'+x+'" name="komenda" onchange="poprawnosc('+x+')"><option value="LOAD">LOAD</option><option value="STORE">STORE</option><option value="ADD">ADD</option><option value="SUB">SUB</option><option value="MULT">MULT</option><option value="DIV">DIV</option><option value="READ">READ</option><option value="WRITE">WRITE</option><option value="JUMP">JUMP</option><option value="JZERO">JZERO</option><option value="JGTZ">JGTZ</option><option value="HALT">HALT</option></select></td>';
+			tabela+='<td><select id="znak'+x+'" name="znak" onclick="poprawnosc('+x+')"><option value=""></option><option value="=">=</option><option value="*">*</option></select></td>';
+			tabela+='<td><input id="adres'+x+'" onchange="poprawnosc('+x+')" value="'+adresy[x]+'"></td>';
+			tabela+='<td><input id="komentarz'+x+'"  value="'+komentarze[x]+'"></td>';
+			tabela+='<td><button id="dodaj'+x+'" onclick="edytuj('+x+')">OK</button><button onclick="wypisz_komendy()">Anuluj</button></td>';
+			tabela+='</tr>';
+			}
+			else
+			{
+				tabela+='<tr>';
+				tabela+='<td>'+(x+1)+'</td>';
+				tabela+='<td><input id="etykieta'+x+'" name="etykieta'+x+'"></td>';
+				tabela+='<td><select id="komenda'+x+'" name="komenda" onchange="poprawnosc('+x+',1)"><option value="LOAD">LOAD</option><option value="STORE">STORE</option><option value="ADD">ADD</option><option value="SUB">SUB</option><option value="MULT">MULT</option><option value="DIV">DIV</option><option value="READ">READ</option><option value="WRITE">WRITE</option><option value="JUMP">JUMP</option><option value="JZERO">JZERO</option><option value="JGTZ">JGTZ</option><option value="HALT">HALT</option></select></td>';
+				tabela+='<td><select id="znak'+x+'" name="znak" onclick="poprawnosc('+x+',1)"><option value=""></option><option value="=">=</option><option value="*">*</option></select></td>';
+				tabela+='<td><input id="adres'+x+'" onchange="poprawnosc('+x+',1)"></td>';
+				tabela+='<td><input id="komentarz'+x+'"></td>';
+				tabela+='<td><button id="dodaj'+x+'" onclick="dodaj('+x+')">OK</button><button onclick="wypisz_komendy()">Anuluj</button></td>';
+				tabela+='</tr>';
+				tabela+='<tr>';
+				tabela+='<td>'+(x+2)+'</td>';
+				tabela+='<td>'+etykiety[x]+'</td>';
+				tabela+='<td>'+komendy[x]+'</td>';
+				tabela+='<td colspan="2">'+znaki[i]+adresy[i]+'</td>';
+				tabela+='<td>'+komentarze[x]+'</td>';
+				tabela+='<td><button class="plus" onclick="dodaj('+x+')">+</button><button class="minus" onclick="usun('+x+')">-</button><button onclick="wypisz_komendy('+x+')">Edytuj</button></td>';
+				tabela+='</tr>';
+			}
+			for(var i=x+1;i<ik;i++)
+			{
+				tabela+='<tr>';
+				if(y==undefined)
+					tabela+='<td>'+(i+1)+'</td>';
+				else
+					tabela+='<td>'+(i+2)+'</td>';
+				tabela+='<td>'+etykiety[i]+'</td>';
+				tabela+='<td>'+komendy[i]+'</td>';
+				tabela+='<td colspan="2">'+znaki[i]+adresy[i]+'</td>';
+				tabela+='<td>'+komentarze[i]+'</td>';
+				tabela+='<td><button class="plus" onclick="wypisz_komendy('+i+')">+</button><button class="minus" onclick="usun('+i+')">-</button><button onclick="wypisz_komendy('+i+')">Edytuj</button></td>';
+				tabela+='</tr>';
+			}
+		}
+		tabela+='<tr id="lastrow">'+document.getElementById("lastrow").innerHTML+'</tr></table>';
+		document.getElementById("lewy").innerHTML = tabela;
+		if(x!=undefined && y==undefined)
+		{
+			document.getElementById("komenda"+x).options[komendy_na_nr(komendy[x])].selected=true;
+			document.getElementById("znak"+x).options[znaki_na_nr(znaki[x])].selected=true;
+		}
+	}
+	function komendy_na_nr(x)
+	{
+		switch(x)
+		{
+		case 'LOAD':return 0;
+		case 'STORE':return 1;
+		case 'ADD':return 2;
+		case 'SUB':return 3;
+		case 'MULT':return 4;
+		case 'DIV':return 5;
+		case 'READ':return 6;
+		case 'WRITE':return 7;
+		case 'JUMP':return 8;
+		case 'JZERO':return 9;
+		case 'JGTZ':return 10;
+		case 'HALT':return 11;
+		default: return 2;
+		}
+	}
+	function znaki_na_nr(x)
+	{
+		switch(x)
+		{
+		case '':return 0;
+		case '=':return 1;
+		case '*':return 2;
+		default: return 0;
+		}
+	}
+	function wykonaj()
+	{
+		
+		nr=0;
+		ilosc_iteracji=0;
+		rejestr_usun();
+		glowica_wejscia=0;
+		usun_wyjscie();
+		status();
+		utworz_polaczenia();
+		while(!program())
+		{
+			ilosc_iteracji++;
+			nr++;
+			if(ilosc_iteracji>100000)
+			{
+				status("Przekroczono czas działania programu");
+				rejestr_odswiez();
+				licznik_rozkazow();
+				break;
+			}
+		}
+		status('Wykonano '+ilosc_iteracji+' iteracji<br>Koniec programu');
+		ilosc_iteracji=0;
+		licznik_rozkazow();
+		wypisz_komendy();
+		nr=0;
+		rejestr_odswiez();
+	}
+	function wykonaj_1()
+	{
+		if(ilosc_iteracji==0)
+		{
+			status();
+			usun_wyjscie();
+			nr=0;
+			rejestr_usun();
+			glowica_wejscia=0;
+		}
+		utworz_polaczenia();
+		if(!program())
+		{
+			ilosc_iteracji++;
+			nr++;
+		}
+		else
+		{
+			document.getElementById("wykonaj1").disabled = true;
+			status('Wykonano '+ilosc_iteracji+' iteracji<br>Koniec programu');
+			ilosc_iteracji=0;
+		}
+		rejestr_odswiez();
+		licznik_rozkazow();
+		wypisz_komendy();
+	}
+	function reset()
+	{
+		document.getElementById("wykonaj1").disabled = false;
+		ilosc_iteracji=0;
+		nr=0;
+		rejestr_usun();
+		rejestr_odswiez();
+		licznik_rozkazow();
+		status();
+		usun_wyjscie();
+		wypisz_komendy();
+	}
+	function rejestr_pobierz(x)
+	{
+		if(rejestry[x]==undefined)
+		{	
+			rejestry[x]=0;
+			return rejestry[x];
+		}
+		else
+			return rejestry[x];
+	}
+	function rejestr_odswiez()
+	{
+		var zawartosc="<table>";
+		for(var i=0;i<rejestry.length;i++)
+		{
+			if(isNaN(rejestry[i]))
+			{
+				rejestry[i]=0;
+			}
+			zawartosc += '<tr><td>Rejestr ' + i + ':</td><td>' + rejestry[i] + "</td></tr>";
+		}
+		zawartosc+="</table>";
+		document.getElementById("rejestr").innerHTML = zawartosc;
+	}
+	function rejestr_usun()
+	{
+		rejestry = [0];
+		rejestr_odswiez;
+	}
+	function wejscie_dodaj()
+	{
+		const el = document.createElement("input");
+		el.id = "wejscie"+rozmiar_wejscia;
+		el.setAttribute("type","number");
+		el.setAttribute("value","0");
+		const div = document.querySelector("#wejscie");
+		div.appendChild(el);
+		rozmiar_wejscia++;
+	}
+	function wejscie_usun()
+	{
+		if(rozmiar_wejscia>0)
+		{
+			rozmiar_wejscia--;
+			document.getElementById("wejscie"+rozmiar_wejscia).remove();
+			
+		}
+	}
+	function licznik_rozkazow()
+	{
+		document.getElementById("licznik_rozkazow").innerHTML = 'Licznik rozkazów: '+(nr+1);
+	}
+	function wyjscie_dodaj(x)
+	{
+		document.getElementById("wyjscie").innerHTML += '<div class="wyjscieel">'+x+'</div>';
+	}
+	function usun_wyjscie()
+	{
+		document.getElementById("wyjscie").innerHTML = "";
+	}
+	function utworz_polaczenia()
+	{
+		polaczenia=[];
+		for(var i=0;i<ik;i++)
+		{
+			if(komendy[i]=='JUMP' || komendy[i]=='JZERO' || komendy[i]=='JGTZ')
+			{
+				for(var j=0;j<ik;j++)
+				{
+					if(adresy[i]==etykiety[j])
+					{
+						polaczenia[i]=j;
+						break;
+					}
+				}
+				if(polaczenia[i]==undefined)
+				{
+					status('Brak etykiety '+adresy[i]);
+					polaczenia[i]=0;
+				}
+			}
+		}
+	}
+	function program()
+	{
+		switch(komendy[nr]) 
+		{
+			case 'LOAD':
+				if(znaki[nr]=='=')
+					rejestry[0] = parseInt(adresy[nr]);
+				else if(znaki[nr]=='')
+					rejestry[0] = parseInt(rejestr_pobierz(adresy[nr]));
+				else
+					rejestry[0] = parseInt(rejestr_pobierz(rejestr_pobierz(adresy[nr])));
+				break;
+			case 'STORE':
+				if(znaki[nr]=='')
+					rejestry[adresy[nr]] = parseInt(rejestry[0]);
+				else
+					rejestry[rejestry[adresy[nr]]] = parseInt(rejestry[0]);
+				break;
+			case 'ADD':
+				if(znaki[nr]=='=')
+					rejestry[0] = parseInt(rejestry[0]) + parseInt(adresy[nr]);
+				else if(znaki[nr]=='')
+					rejestry[0] = parseInt(rejestry[0]) + parseInt(rejestr_pobierz(adresy[nr]));
+				else
+					rejestry[0] = parseInt(rejestry[0]) + parseInt(rejestr_pobierz(rejestr_pobierz(adresy[nr])));
+				break;
+			case 'SUB':
+				if(znaki[nr]=='=')
+					rejestry[0] = parseInt(rejestry[0]) - parseInt(adresy[nr]);
+				else if(znaki[nr]=='')
+					rejestry[0] = parseInt(rejestry[0]) - parseInt(rejestr_pobierz(adresy[nr]));
+				else
+					rejestry[0] = parseInt(rejestry[0]) - parseInt(rejestr_pobierz(rejestr_pobierz(adresy[nr])));
+				break;
+			case 'MULT':
+				if(znaki[nr]=='=')
+					rejestry[0] = parseInt(rejestry[0]) * parseInt(adresy[nr]);
+				else if(znaki[nr]=='')
+					rejestry[0] = parseInt(rejestry[0]) * parseInt(rejestr_pobierz(adresy[nr]));
+				else
+					rejestry[0] = parseInt(rejestry[0]) * parseInt(rejestr_pobierz(rejestr_pobierz(adresy[nr])));
+				break;
+			case 'DIV':
+				if(znaki[nr]=='=')
+				rejestry[0] = Math.floor(parseInt(rejestry[0]) / parseInt(adresy[nr]));
+				else if(znaki[nr]=='')
+					rejestry[0] = Math.floor(parseInt(rejestry[0]) / parseInt(rejestr_pobierz(adresy[nr])));
+				else
+					rejestry[0] = Math.floor(parseInt(rejestry[0]) / parseInt(rejestr_pobierz(rejestr_pobierz(adresy[nr]))));
+				break;
+			case 'READ':
+				if(glowica_wejscia>=rozmiar_wejscia || rozmiar_wejscia==0)
+				{
+					status("Taśma wejścia się skończyła");
+					return 3;
+				}
+				else
+				{
+					if(znaki[nr]=='')
+					{
+						rejestry[adresy[nr]] = parseInt(document.getElementById("wejscie"+glowica_wejscia).value);
+						glowica_wejscia++;
+					}
+					if(znaki[nr]=='*')
+					{
+						rejestry[rejestry[adresy[nr]]] = parseInt(document.getElementById("wejscie"+glowica_wejscia).value);
+						glowica_wejscia++;
+					}
+				}
+				break;
+			case 'WRITE':
+				if(znaki[nr]=='=')
+					wyjscie_dodaj(adresy[nr]);
+				else if(znaki[nr]=='')
+					wyjscie_dodaj(rejestr_pobierz(adresy[nr]));
+				else
+					wyjscie_dodaj(rejestr_pobierz(rejestr_pobierz(adresy[nr])));
+				break;
+			case 'JUMP':
+				nr=polaczenia[nr]-1;
+				break;
+			case 'JZERO':
+				if(rejestry[0]==0)
+				{
+					nr=polaczenia[nr]-1;
+				}
+				break;
+			case 'JGTZ':
+				if(rejestry[0]>0)
+				{
+					nr=polaczenia[nr]-1;
+				}	
+				break;
+			case 'HALT':
+				return 1;
+				break;
+			default:
+				status("Brak komendy Halt");
+				return 2;
+		}
+		return 0;
+	}
+	function status(x)
+	{	
+		if(x==undefined)
+			document.getElementById("status").innerHTML ='';
+		else
+			document.getElementById("status").innerHTML += x + '<br>';
+	}
+	function pokaz_kod()
+	{
+		var kod='';
+		for(var i=0;i<ik;i++)
+		{
+			kod+=etykiety[i]+','+komendy[i]+','+znaki[i]+','+adresy[i]+','+komentarze[i]+';\n';
+		}
+		document.getElementById("kod_programu").value=kod;
+	}
+	function zaladuj_kod(x)
+	{
+		var kod;
+		var typ=0;
+		if(x==undefined)
+			kod = document.getElementById("kod_programu").value;
+		else
+			kod = x;
+		var tekst;
+		etykiety.splice(0,ik);
+		komendy.splice(0,ik);
+		znaki.splice(0,ik);
+		adresy.splice(0,ik);
+		komentarze.splice(0,ik);
+		ik=0;
+		var i=0;
+		if(kod!='')
+		{
+		while(i<kod.length)
+		{
+			status();
+			tekst='';
+			while(kod[i]!=',')
+			{
+				if(kod[i]==undefined || kod[i]==';')
+				{
+					status("Brak przecinka po etykiecie w linii "+(ik+1));
+					wypisz_komendy();
+					return;
+				}
+				tekst+=kod[i];
+				i++;
+			}
+			tekst=tekst.trim();
+			etykiety[ik]=tekst;
+			i++;
+			tekst='';
+			while(kod[i]!=',')
+			{
+				if(kod[i]==undefined || kod[i]==';')
+				{
+					status("Brak przecinka po komendzie w linii "+(ik+1));
+					wypisz_komendy();
+					return;
+				}
+				tekst+=kod[i];
+				i++;
+			}
+			tekst=tekst.trim();
+			if(tekst=="LOAD" || tekst=="STORE" || tekst=="ADD" || tekst=="SUB" || tekst=="MULT" || tekst=="DIV" || tekst=="READ" || tekst=="WRITE" || tekst=="JUMP" || tekst=="JZERO" || tekst=="JGTZ" || tekst=="HALT")
+			{
+				komendy[ik]=tekst;
+				i++;
+			}
+			else
+			{
+				status("Zła nazwa komendy w linii "+(ik+1));
+				wypisz_komendy();
+				return;
+			}
+			tekst='';
+			while(kod[i]!=',')
+			{
+				if(kod[i]==undefined || kod[i]==';')
+				{
+					status("Brak przecinka po znaku w linii "+(ik+1));
+					wypisz_komendy();
+					return;
+				}
+				tekst+=kod[i];
+				i++;
+			}
+			tekst=tekst.trim();
+			if(tekst=="" || tekst=="*" || tekst=="=")
+			{
+				znaki[ik]=tekst;
+				i++;
+			}
+			else
+			{
+				status("Zły znak w linii "+(ik+1));
+				wypisz_komendy();
+				return;
+			}
+			tekst='';
+			while(kod[i]!=',')
+			{	
+				if(kod[i]==undefined || kod[i]==';')
+				{
+					status("Brak przecinka po adresie w linii "+(ik+1));
+					wypisz_komendy();
+					return;
+				}
+				tekst+=kod[i];
+				i++;
+			}
+			tekst=tekst.trim();
+			adresy[ik]=tekst;
+			i++;
+			tekst='';
+			while(kod[i]!=';')
+			{
+				if(kod[i]==undefined || kod[i]==',')
+				{
+					status("Brak średnika po komentarzu w linii "+(ik+1));
+					wypisz_komendy();
+					return;
+				}
+				tekst+=kod[i];
+				i++;
+			}
+			tekst=tekst.trim();
+			komentarze[ik]=tekst;
+			i++;
+			if(kod[i]=="\n")
+			{
+				i++;
+			}
+			ik++;
+		}
+		}
+		wypisz_komendy();
+	}
+	function przykladowe_programy()
+	{
+	
+		var program=document.getElementById("programy").value;
+		if(program=='ndon')
+		{
+			zaladuj_kod(ndon);
+		}
+		else if(program=='silnia')
+		{
+			zaladuj_kod(silnia);
+		}
+		else if(program=='suma')
+		{
+			zaladuj_kod(suma);
+		}
+	}
+	function pomoc(x)
+	{
+	if(x==1)
+	{
+		document.getElementById("pomoc").style.display="inline";
+		document.getElementById("content").style.filter="blur(4px)";
+	}
+	else
+	{
+		document.getElementById("pomoc").style.display="none";
+		document.getElementById("content").style.filter="none";
+	}
+	}
+	function rozwin(x)
+	{
+		if(document.getElementById("znak"+x).innerHTML == '˅')
+		{
+			document.getElementById("pomoc"+x).style.display='block';
+			document.getElementById("znak"+x).innerHTML = '&#708;';
+		}
+		else
+		{
+			document.getElementById("pomoc"+x).style.display='none';
+			document.getElementById("znak"+x).innerHTML = '&#709;';
+		}
+	}
+	</script>
+</body>
+</html>
