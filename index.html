@@ -116,8 +116,8 @@
 		#menu
 		{
 			position:absolute;
-			right:50px;
-			top:28px;
+			right:20px;
+			top:20px;
 		}
 		#content
 		{
@@ -244,13 +244,25 @@
 		{
 			background-color:green; !important
 		}
+		#baner
+		{
+			position:relative;
+		}
+		#blad
+		{
+			font-size:13px;
+			float:left;
+			color:#727272;
+			text-align:center;
+			padding-right:10px;
+		}
 	</style>
 </head>
 <body>
 	<div id="pomoc">
 		<center><h1>Pomoc</h1></center>
 		<button onclick="pomoc(0)" class="x">X</button>
-		<h3 onclick="rozwin(1)">Krótki opis maszyn RAM <p id="znak1">&#709;</p></h3>
+		<h3 onclick="rozwin(1)">Krótki opis maszyn RAM <p id="symbol1">&#709;</p></h3>
 		<p id="pomoc1" class="opisy">
 			Maszyna RAM – jest modelem abstrakcyjnej maszyny ze swobodnym dostępem do pamięci.
 			Programem maszyny RAM jest ciąg poleceń, które mogą być poprzedzone etykietą. W tym emulatorze mamy dostępne następujące polecenia:
@@ -275,56 +287,62 @@
 			*i - wartością operandu jest zawartość rejestru, którego numerem jest wartość rejestru i<br>
 			Wyjątekiem jest komenda HALT, która nie posiada adresu.
 		</p>
-		<h3 onclick="rozwin(2)">Wpisywanie poleceń <p id="znak2">&#709;</p></h3>
+		<h3 onclick="rozwin(2)">Wpisywanie poleceń <p id="symbol2">&#709;</p></h3>
 		<p id="pomoc2" class="opisy">
 			Polecenia możemy wpisywać w tabeli po lewej stronie. W kolumnie etykieta możemy wpisać dowolny ciąg znaków, ważne aby nie zawierał w sobie średnika i przecinka. W kolumnie Komenda mamy do wyboru listę komend dostępnych w emulatorze. W kolumnie Adres po lewej stronie możemy wybrać znak operandu po prawej natomiast możemy wpisać wartość operandu. Jeżeli wpisujemy etykietę znak zostawiamy pusty, natomiast w przypadku polecenia HALT oba pola zostają puste. W komentarzu możemy wpisać dowolny ciąg znaków bez przecinka i średnika.
 			<br>Przycisk<button class="plus">+</button>Dodaje wpisaną przez nas komendę. W przypadku błędnego zapisu w oknie status wyświetli się odpowiedni komunikat. Tym przyciskiem możemy również dodać polecenie w środku listy komend. Po kliknięciu tego przycisku obok komendy powyżej pojawią się pola do których możemy wpisać nowe polecenie i zatwierdzić je przyciskiem <button>OK</button>
 			<br>Przycisk<button class="minus">-</button>Usuwa komendę przy której się znajduje
 			<br>Po naciśnięciu przycisku <button>Edytuj</button> możemy edytować komendę znajdującą się obok.
 		</p>
-		<h3 onclick="rozwin(3)">Taśma wejściowa <p id="znak3">&#709;</p></h3>
+		<h3 onclick="rozwin(3)">Taśma wejściowa <p id="symbol3">&#709;</p></h3>
 		<p id="pomoc3" class="opisy">
 			Elementy taśmy wejściowej będą wczytywane po kolei zaczynając od pierwszego dodanego elementu. Liczby podane jako wejście muszą być typu całkowitego. Jeżeli element taśmy wejściowej będzie pusty zostanie wczytany jako zero.<br>
 		</p>
-		<h3 onclick="rozwin(4)">Uruchamianie programu <p id="znak4">&#709;</p></h3>
+		<h3 onclick="rozwin(4)">Uruchamianie programu <p id="symbol4">&#709;</p></h3>
 		<p id="pomoc4" class="opisy">
 			Przycisk <button>Wykonaj</button> wykonuje program od początku do końca. Jeżeli program napotka jakiś błąd, wyświetli odpowiedni komunikat.<br>
 			Przycisk <button>></button> wykonuje następną komendę.<br>
 			Przycisk <button>RESET</button> zaczyna program od nowa.<br>
 		</p>
-		<h3 onclick="rozwin(5)">Licznik rozkazów <p id="znak5">&#709;</p></h3>
+		<h3 onclick="rozwin(5)">Licznik rozkazów <p id="symbol5">&#709;</p></h3>
 		<p id="pomoc5" class="opisy">
 		Licznik rozkazów wskazuje nam polecenie, które ma być wykonane jako następna. Następne polecenie jest również zaznaczone na zielono.<br>
 		</p>
-		<h3 onclick="rozwin(6)">Status <p id="znak6">&#709;</p></h3>
+		<h3 onclick="rozwin(6)">Status <p id="symbol6">&#709;</p></h3>
 		<p id="pomoc6" class="opisy">
 			Okno status wyświetla informacje związane z wykonywaniem się programu jak i z błędami podczas wpisywania komend w tabeli oraz podczas wczytywania koemnd z tekstu.
 		</p>
-		<h3 onclick="rozwin(7)">Taśma wyjściowa <p id="znak7">&#709;</p></h3>
+		<h3 onclick="rozwin(7)">Taśma wyjściowa <p id="symbol7">&#709;</p></h3>
 		<p id="pomoc7" class="opisy">
 			Na taśmie wyjściowej pojawią sie kolejne wartości uzyskane przez polecenie WRITE.
 		</p>
-		<h3 onclick="rozwin(8)">Zawartość rejestrów <p id="znak8">&#709;</p></h3>
+		<h3 onclick="rozwin(8)">Zawartość rejestrów <p id="symbol8">&#709;</p></h3>
 		<p id="pomoc8" class="opisy">
 			Wyświetla nam wartości które aktualnie znajdują się w rejestrach.
 		</p>
-		<h3 onclick="rozwin(9)">Załaduj/Pobierz kod <p id="znak9">&#709;</p></h3>
+		<h3 onclick="rozwin(9)">Załaduj/Pobierz kod <p id="symbol9">&#709;</p></h3>
 		<p id="pomoc9" class="opisy">
 			Przycisk <button>Pokaż kod</button> wyświetla w oknie kod naszego programu w postaci ciągu znaków. Każdy element polecenia zostanie rozdzielony przecinkami, każde polecenie zostanie rozdzielone średnikiem. Kod wyświetlony w oknie możemy skopiować i wkleić do notatnika, co pozwoli nam go ponownie wczytać przy pomocy opcji załaduj kod.<br>
 			Przycisk <button>Załaduj kod</button> pobiera kod znajdujacy sie w oknie i wpisuje go do pamieci. Format wpisanego kodu musi być taki sam jak w przypadku kodu, który został wyświetlony, czyli poszczególne elementy polecenia muszą być rozdzielone przecinkami, natomiast polecenia zostaną oddzielone średnikiem. Kod może być dowolnie rozdzielony znakami tak jak odstęp czy tabulacja.
 		</p>
-		<h3 onclick="rozwin(10)">Przykładowe programy <p id="znak10">&#709;</p></h3>
+		<h3 onclick="rozwin(10)">Przykładowe programy <p id="symbol10">&#709;</p></h3>
 		<p id="pomoc10" class="opisy">
 			Przycisk <button>Załaduj program</button> pozwala nam załadować program wybrany z listy do pamieci naszej maszyny.
 		</p>
 	</div>
 	<div id="content">
-	<div id="logo">
-		Emulator maszyny RAM
-		<div id="menu">
-			<button onclick="pomoc(1)">Pomoc</button>
+		<div id="baner">
+			<div id="logo">
+				Emulator maszyny RAM
+			</div>
+			<div id="menu">
+				<div id="blad">
+					Jeśli znalazłeś błąd napisz na:<br> 
+					michalzdzieblo@gmail.com
+				</div>
+				<button onclick="pomoc(1)">Pomoc</button>
+			</div>
 		</div>
-	</div>
 		<div id="lewy">
 			<table id="program">
 				<tr id="firstrow">
@@ -721,7 +739,7 @@
 				break;
 			}
 		}
-		status('Wykonano '+ilosc_iteracji+' iteracji<br>Koniec programu');
+		status('Wykonano '+ilosc_iteracji+' poleceń<br>Koniec programu');
 		ilosc_iteracji=0;
 		licznik_rozkazow();
 		wypisz_komendy();
@@ -747,7 +765,7 @@
 		else
 		{
 			document.getElementById("wykonaj1").disabled = true;
-			status('Wykonano '+ilosc_iteracji+' iteracji<br>Koniec programu');
+			status('Wykonano '+ilosc_iteracji+' poleceń<br>Koniec programu');
 			ilosc_iteracji=0;
 		}
 		rejestr_odswiez();
@@ -1122,15 +1140,15 @@
 	}
 	function rozwin(x)
 	{
-		if(document.getElementById("znak"+x).innerHTML == '˅')
+		if(document.getElementById("symbol"+x).innerHTML == '˅')
 		{
 			document.getElementById("pomoc"+x).style.display='block';
-			document.getElementById("znak"+x).innerHTML = '&#708;';
+			document.getElementById("symbol"+x).innerHTML = '&#708;';
 		}
 		else
 		{
 			document.getElementById("pomoc"+x).style.display='none';
-			document.getElementById("znak"+x).innerHTML = '&#709;';
+			document.getElementById("symbol"+x).innerHTML = '&#709;';
 		}
 	}
 	</script>
